@@ -11,6 +11,7 @@ stringData:
     PrivateKey = {{ .Values.privateKey }}
     Address = {{ .Values.network }}
     ListenPort = {{ .Values.listenPort }}
+    MTU = {{ .Values.mtu }}
     PostUp = iptables -A FORWARD -i {{ .Values.networkInterface }} -j ACCEPT ; iptables -t nat -A POSTROUTING -o {{ .Values.networkInterface }} -j MASQUERADE
     PostDown = iptables -D FORWARD -i {{ .Values.networkInterface }} -j ACCEPT; iptables -t nat -D POSTROUTING -o {{ .Values.networkInterface }} -j MASQUERADE
 
