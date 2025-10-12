@@ -16,6 +16,8 @@ spec:
     metadata:
       labels:
         app: wireguard
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/secret.yaml.tpl") . | sha256sum }}
     spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
