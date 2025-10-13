@@ -1,11 +1,125 @@
-replicas: 1
-interface: wg0
-listenPort: 51820
-network: 10.10.0.1/24
-networkInterface: eth0
-mtu: 1280
-image: ghcr.io/denefoster/k8s-wireguard:v1.0.8
-dnsForward: /etc/resolv.conf
-dnsPrivateZone: internal
+wireguard:
+  interface: wg0
+  forwarding: "true"
+  listenPort: 51820
+  network: 10.10.0.1/24
+  networkInterface: eth0
+  mtu: 1280
+  dnsForward: /etc/resolv.conf
+  dnsPrivateZone: internal
+  deployKind: DaemonSet
+  metrics: true
+
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# This sets the type of deployment, either DaemonSet or Deployment
 deployKind: DaemonSet
-metrics: true
+# If deployKind: Deployment
+# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 3
+
+# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+image:
+  repository: ghcr.io/denefoster/k8s-wireguard
+
+  # This sets the pull policy for images.
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "v1.1.0"
+
+# This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+# This is to override the chart name.
+nameOverride: ""
+fullnameOverride: ""
+
+# This is for setting Kubernetes Annotations to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+podAnnotations: {}
+# This is for setting Kubernetes Labels to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+podLabels: {}
+
+podSecurityContext: {}
+
+securityContext:
+  privileged: true
+  capabilities:
+    add:
+      - NET_ADMIN
+      - NET_BIND_SERVICE
+
+# This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
+service:
+  # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  type: LoadBalancer
+  annotations: {}
+  # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+
+
+# This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8080
+readinessProbe:
+  httpGet:
+    path: /health
+    port: http
+    port: 8080
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+volumes:
+  - name: wireguard-config
+    secret:
+      secretName: wireguard
+      optional: false
+
+volumeMounts:
+  - name: wireguard-config
+    mountPath: "/etc/wireguard/{{ .Values.wireguard.interface }}.conf"
+    subPath: wireguard
+    readOnly: true
+  - name: wireguard-config
+    mountPath: /etc/coredns/Corefile
+    subPath: coredns
+    readOnly: true
+  - name: wireguard-config
+    mountPath: /etc/coredns/private_hosts
+    subPath: coredns_private_hosts
+    readOnly: true
