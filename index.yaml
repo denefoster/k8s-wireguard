@@ -2,6 +2,18 @@ apiVersion: v1
 entries:
   wireguard:
   - apiVersion: v2
+    appVersion: 1.2.1
+    created: "2025-11-13T20:43:50.350992385Z"
+    description: Chart for deploying Wireguard
+    digest: ed98575d982d82ceec8193279c733611bad5a11e6fb7d01218ca6a9623d949fb
+    maintainers:
+    - name: Dane Foster
+    name: wireguard
+    type: application
+    urls:
+    - https://github.com/denefoster/k8s-wireguard/releases/download/wireguard-1.2.1/wireguard-1.2.1.tgz
+    version: 1.2.1
+  - apiVersion: v2
     appVersion: 1.2.0
     created: "2025-11-13T20:32:54.755787556Z"
     description: Chart for deploying Wireguard
@@ -36,4 +48,4 @@ entries:
     urls:
     - https://github.com/denefoster/k8s-wireguard/releases/download/wireguard-1.0.8/wireguard-1.0.8.tgz
     version: 1.0.8
-generated: "2025-11-13T20:32:54.755798567Z"
+generated: "2025-11-13T20:43:50.351007103Z"
