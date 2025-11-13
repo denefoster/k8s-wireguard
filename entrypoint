@@ -18,6 +18,12 @@ configure_coredns() {
 
   mkdir -p /etc/coredns
   cat << END >> /etc/coredns/Corefile
+internal {
+  hosts /etc/coredns/private_hosts
+  log
+  errors
+}
+
 . {
   bind wg0
   forward . /etc/resolv.conf
@@ -32,8 +38,6 @@ if [[ ! -z "$WG_IP_FORWARDING" ]]; then
   configure_ip_forwarding
 fi
 
-if [ ! -f "/etc/coredns/Corefile" ]; then
-  configure_coredns
-fi
+configure_coredns
 
 exec "$@"
