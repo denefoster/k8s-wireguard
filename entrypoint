@@ -19,6 +19,7 @@ configure_coredns() {
   mkdir -p /etc/coredns
   cat << END >> /etc/coredns/Corefile
 . {
+  bind wg0
   forward . /etc/resolv.conf
   log
   errors
