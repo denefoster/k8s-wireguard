@@ -38,6 +38,8 @@ if [[ ! -z "$WG_IP_FORWARDING" ]]; then
   configure_ip_forwarding
 fi
 
-configure_coredns
+if [ ! -f "/etc/coredns/Corefile" ]; then
+  configure_coredns
+fi
 
 exec "$@"
