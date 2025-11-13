@@ -2,7 +2,7 @@ apiVersion: v2
 description: Chart for deploying Wireguard
 name: wireguard
 type: application
-version: 1.2.3
-appVersion: v1.2.3
+version: 1.2.4
+appVersion: v1.2.4
 maintainers:
   - name: Dane Foster
