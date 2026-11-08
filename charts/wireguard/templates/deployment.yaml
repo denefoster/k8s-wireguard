@@ -1,0 +1,109 @@
+apiVersion: apps/v1
+kind: {{ .Values.deployKind }}
+metadata:
+  name: {{ include "wireguard.fullname" . }}
+  labels:
+    {{- include "wireguard.labels" . | nindent 4 }}
+spec:
+  {{- if eq .Values.deployKind "Deployment" }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "wireguard.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "wireguard.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: WG_INTERFACE
+              value: "{{ .Values.wireguard.interface }}"
+            - name: WG_IP_FORWARDING
+              value: "{{ .Values.wireguard.forwarding }}"
+            - name: WG_ENABLE
+              value: "true"
+            - name: WG_COREDNS
+              value: "true"
+            {{- if .Values.wireguard.metrics }}
+            - name: WG_PEER_MONITOR
+              value: "true"
+            - name: WG_PROM_METRICS
+              value: "true"
+            {{- end }}
+          ports:
+            - containerPort: {{ .Values.wireguard.listenPort }}
+              protocol: UDP
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 9090
+              protocol: TCP
+            - containerPort: 53
+              protocol: UDP
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: wireguard-config
+              mountPath: "/etc/wireguard/{{ .Values.wireguard.interface }}.conf"
+              subPath: wireguard
+              readOnly: true
+            - name: wireguard-config
+              mountPath: /etc/coredns/Corefile
+              subPath: coredns
+              readOnly: true
+            - name: wireguard-config
+              mountPath: /etc/coredns/private_hosts
+              subPath: coredns_private_hosts
+              readOnly: true
+      volumes:
+        - name: wireguard-config
+          secret:
+            secretName: wireguard
+            optional: false
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+

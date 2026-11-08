@@ -18,7 +18,14 @@ configure_coredns() {
 
   mkdir -p /etc/coredns
   cat << END >> /etc/coredns/Corefile
+internal {
+  hosts /etc/coredns/private_hosts
+  log
+  errors
+}
+
 . {
+  bind wg0
   forward . /etc/resolv.conf
   log
   errors

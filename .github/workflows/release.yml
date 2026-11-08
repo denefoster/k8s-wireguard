@@ -2,9 +2,15 @@ name: Release Charts
 
 on:
   push:
+<<<<<<< HEAD
     branches:
       - main
 
+||||||| 0e326b4
+=======
+    tags:
+      - "*"
+>>>>>>> 7343cd51853664a78676b9fc190985e0493b41a6
 jobs:
   release:
     permissions:
