@@ -2,13 +2,7 @@ apiVersion: v2
 description: Chart for deploying Wireguard
 name: wireguard
 type: application
-<<<<<<<< HEAD:chart/wireguard/Chart.yaml
-version: 1.0.0
-|||||||| 0e326b4:chart/Chart.yaml
-version: 1.1.0
-========
-version: 1.2.4
-appVersion: v1.2.4
->>>>>>>> 7343cd51853664a78676b9fc190985e0493b41a6:charts/wireguard/Chart.yaml
+version: 1.2.5
+appVersion: v1.2.5
 maintainers:
   - name: Dane Foster
